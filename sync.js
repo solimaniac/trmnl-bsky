@@ -126,11 +126,20 @@ async function sendTrendsToWebhook(trendsData) {
     return Promise.reject(new Error('Trends data is required to send to webhook.'));
   }
 
+  const mappedTrendsData = trendsData.trends ? trendsData.trends.map(trend => {
+    return {
+      displayName: trend.displayName,
+      postCount: trend.postCount,
+      startedAt: trend.startedAt,
+      status: trend.status
+    };
+  }) : [];
+
   const parsedUrl = url.parse(webhookUrl);
 
   const postData = JSON.stringify({
     merge_variables: {
-        trends: trendsData
+        trends: mappedTrendsData
     }
   });
 
@@ -194,12 +203,12 @@ async function main() {
     console.log(JSON.stringify(session, null, 2));
 
     if (session && session.accessJwt) {
-      const trends = await getBlueskyTrends(session.accessJwt);
+      const trendsResponse = await getBlueskyTrends(session.accessJwt);
       console.log('\nBluesky Trends:');
-      console.log(JSON.stringify(trends, null, 2));
+      console.log(JSON.stringify(trendsResponse, null, 2));
 
-      if (trends) {
-        const webhookResponse = await sendTrendsToWebhook(trends);
+      if (trendsResponse && trendsResponse.trends) {
+        const webhookResponse = await sendTrendsToWebhook(trendsResponse);
         console.log('\nWebhook response:');
         console.log(`Status Code: ${webhookResponse.statusCode}`);
         console.log('Body:', JSON.stringify(webhookResponse.body, null, 2));
