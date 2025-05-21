@@ -8,7 +8,13 @@
           </div>
           <div class="content">
             <span class="title title--small">{{ trend.displayName | escape }}</span>
-            <span class="description">{{ trend.postCount }} posts</span>
+            <span class="description">
+              {% if trend.postCount >= 1000 %}
+                {{ trend.postCount | divided_by: 1000.0 | round: 1 }}k posts
+              {% else %}
+                {{ trend.postCount }} posts
+              {% endif %}
+            </span>
             <div class="flex gap--xsmall">
               {% if trend.status and trend.status == "hot" %}
                 <span class="label label--small">Trending now</span>
