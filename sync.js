@@ -124,6 +124,94 @@ async function getBlueskyTrends(accessJwt) {
   });
 }
 
+async function getBlueskyPosts(accessJwt) {
+  if (!accessJwt) {
+    return Promise.reject(new Error('Access JWT is required to get posts.'));
+  }
+
+  const options = {
+    hostname: 'bsky.social',
+    path: '/xrpc/app.bsky.feed.getTimeline?limit=100',
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${accessJwt}`,
+    },
+  };
+
+  return new Promise((resolve, reject) => {
+    const req = https.request(options, (res) => {
+      let rawData = '';
+      res.setEncoding('utf8');
+      res.on('data', (chunk) => {
+        rawData += chunk;
+      });
+      res.on('end', () => {
+        try {
+          if (res.statusCode >= 200 && res.statusCode < 300) {
+            const parsedData = JSON.parse(rawData);
+            
+            const filteredPosts = parsedData.feed
+              .filter(item => {
+                if (item.post.record.$type === 'app.bsky.feed.post' && 
+                    item.post.record.reply) {
+                  return false;
+                }
+                
+                if (item.reason && item.reason.$type === 'app.bsky.feed.defs#reasonRepost') {
+                  return false;
+                }
+                
+                if (item.post.embed && 
+                   (item.post.embed.$type === 'app.bsky.embed.images#view' || 
+                    (item.post.record.embed && item.post.record.embed.$type === 'app.bsky.embed.images'))) {
+                  return false;
+                }
+                
+                if ((item.post.embed && item.post.embed.$type === 'app.bsky.embed.external#view') ||
+                    (item.post.record.embed && item.post.record.embed.$type === 'app.bsky.embed.external')) {
+                  return false;
+                }
+                
+                return true;
+              })
+              .map(item => {
+                return {
+                  authorName: item.post.author.displayName || item.post.author.handle,
+                  authorAvatar: item.post.author.avatar,
+                  text: item.post.record.text,
+                  likeCount: item.post.likeCount,
+                  repostCount: item.post.repostCount,
+                  commentCount: item.post.replyCount
+                };
+              });
+            
+            resolve({
+              posts: filteredPosts
+            });
+          } else {
+            let errorMsg = `HTTP error! status: ${res.statusCode}`;
+            try {
+              const errorDetails = JSON.parse(rawData);
+              errorMsg += ` - ${errorDetails.error || ''}: ${errorDetails.message || rawData}`;
+            } catch (e) {
+              errorMsg += ` - Unable to parse error response: ${rawData}`;
+            }
+            reject(new Error(errorMsg));
+          }
+        } catch (e) {
+          reject(new Error(`Failed to parse JSON response: ${e.message}. Raw data: ${rawData}`));
+        }
+      });
+    });
+
+    req.on('error', (e) => {
+      reject(new Error(`Problem with request: ${e.message}`));
+    });
+
+    req.end();
+  });
+}
+
 async function sendTrendsToWebhook(trendsData) {
   const webhookUrl = process.env.TRMNL_CUSTOM_PLUGIN_WEBHOOK_URL;
 
@@ -208,6 +296,10 @@ async function main() {
       console.log('\nBluesky Trends:');
       console.log(JSON.stringify(trendsResponse, null, 2));
 
+      const postsResponse = await getBlueskyPosts(session.accessJwt);
+      console.log('\nBluesky Posts:');
+      console.log(JSON.stringify(postsResponse, null, 2));
+
       if (trendsResponse && trendsResponse.trends) {
         const webhookResponse = await sendTrendsToWebhook(trendsResponse);
         console.log('\nWebhook response:');
@@ -216,7 +308,6 @@ async function main() {
       } else {
         console.error('No trends data to send to webhook.');
       }
-
     } else {
       console.error('Failed to retrieve accessJwt from session.');
     }
