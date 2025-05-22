@@ -89,7 +89,17 @@ async function getBlueskyTrends(accessJwt) {
         try {
           if (res.statusCode >= 200 && res.statusCode < 300) {
             const parsedData = JSON.parse(rawData);
-            resolve(parsedData);
+            
+            const mappedTrendsData = parsedData.trends ? parsedData.trends.map(trend => {
+              return {
+                displayName: trend.displayName,
+                postCount: trend.postCount,
+                startedAt: trend.startedAt,
+                status: trend.status
+              };
+            }) : [];
+            
+            resolve({ ...parsedData, trends: mappedTrendsData });
           } else {
             let errorMsg = `HTTP error! status: ${res.statusCode}`;
             try {
@@ -126,20 +136,11 @@ async function sendTrendsToWebhook(trendsData) {
     return Promise.reject(new Error('Trends data is required to send to webhook.'));
   }
 
-  const mappedTrendsData = trendsData.trends ? trendsData.trends.map(trend => {
-    return {
-      displayName: trend.displayName,
-      postCount: trend.postCount,
-      startedAt: trend.startedAt,
-      status: trend.status
-    };
-  }) : [];
-
   const parsedUrl = url.parse(webhookUrl);
 
   const postData = JSON.stringify({
     merge_variables: {
-        trends: mappedTrendsData
+        trends: trendsData.trends || []
     }
   });
 
