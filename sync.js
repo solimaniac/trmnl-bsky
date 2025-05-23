@@ -212,7 +212,7 @@ async function getBlueskyPosts(accessJwt) {
   });
 }
 
-async function sendTrendsToWebhook(trendsData) {
+async function sendData(data) {
   const webhookUrl = process.env.TRMNL_CUSTOM_PLUGIN_WEBHOOK_URL;
 
   if (!webhookUrl) {
@@ -220,15 +220,16 @@ async function sendTrendsToWebhook(trendsData) {
     process.exit(1);
   }
 
-  if (!trendsData) {
-    return Promise.reject(new Error('Trends data is required to send to webhook.'));
+  if (!data) {
+    return Promise.reject(new Error('Data is required to send to webhook.'));
   }
 
   const parsedUrl = url.parse(webhookUrl);
 
   const postData = JSON.stringify({
     merge_variables: {
-        trends: trendsData.trends || []
+      trends: data.trends || [],
+      posts: data.posts || []
     }
   });
 
@@ -251,13 +252,12 @@ async function sendTrendsToWebhook(trendsData) {
       });
       res.on('end', () => {
         try {
-
-            if (res.statusCode >= 200 && res.statusCode < 300) {
+          if (res.statusCode >= 200 && res.statusCode < 300) {
             let responseData = rawData;
             try {
-                responseData = JSON.parse(rawData);
+              responseData = JSON.parse(rawData);
             } catch (e) {
-                console.log('Webhook response was not JSON, or empty. Status:', res.statusCode);
+              console.log('Webhook response was not JSON, or empty. Status:', res.statusCode);
             }
             resolve({ statusCode: res.statusCode, body: responseData });
           } else {
@@ -300,14 +300,14 @@ async function main() {
       console.log('\nBluesky Posts:');
       console.log(JSON.stringify(postsResponse, null, 2));
 
-      if (trendsResponse && trendsResponse.trends) {
-        const webhookResponse = await sendTrendsToWebhook(trendsResponse);
-        console.log('\nWebhook response:');
-        console.log(`Status Code: ${webhookResponse.statusCode}`);
-        console.log('Body:', JSON.stringify(webhookResponse.body, null, 2));
-      } else {
-        console.error('No trends data to send to webhook.');
-      }
+      const webhookResponse = await sendData({
+        trends: trendsResponse.trends || [],
+        posts: postsResponse.posts || []
+      });
+      console.log('\nWebhook response:');
+      console.log(`Status Code: ${webhookResponse.statusCode}`);
+      console.log('Body:', JSON.stringify(webhookResponse.body, null, 2));
+
     } else {
       console.error('Failed to retrieve accessJwt from session.');
     }
