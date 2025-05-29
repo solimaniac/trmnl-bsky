@@ -1,0 +1,77 @@
+<style>
+    .description {
+      white-space: normal !important;
+      overflow: visible !important;
+      text-overflow: unset !important;
+      word-wrap: normal !important;
+      word-break: keep-all !important;
+      hyphens: none !important;
+      overflow-wrap: normal !important;
+      display: block !important;
+      margin-bottom: 8px;
+    }
+    
+    .content {
+      margin-left: 45px !important;
+      padding-left: 4px !important;
+    }
+    
+    .meta {
+      position: absolute !important;
+      left: 15px !important;
+      top: 0 !important;
+    }
+    
+    .item {
+      position: relative !important;
+      padding-left: 0 !important;
+      margin-left: 0 !important;
+    }
+    
+    .engagement-stats {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+    
+    .engagement-stats i {
+      color: #666;
+    }
+  </style>
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  
+  <div class="layout">
+      <div class="list" data-list-limit="true" data-list-max-height="none" data-list-hidden-count="false" data-list-max-columns="1" style="vertical-align: top;">
+        {% if timeline and timeline.size > 0 %}
+          {% for post in timeline %}
+          <div class="item">
+            <div class="meta">
+              <img class="avatar" src="{{ post.authorAvatar }}" alt="{{ post.authorName }} avatar" width="48" height="48" style="border-radius: 50%;">
+            </div>
+            <div class="content">
+              <span class="title title--small">{{ post.authorName | escape }}</span>
+              <span class="description">{{ post.text | escape }}</span>
+              <div class="engagement-stats">
+                <span class="label label--small"><i class="fas fa-comment"></i> {{ post.commentCount }}</span>
+                <span class="label label--small"><i class="fas fa-retweet"></i> {{ post.repostCount }}</span>
+                <span class="label label--small"><i class="fas fa-heart"></i> {{ post.likeCount }}</span>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <span class="label">Timeline</span>
+          <div class="item">
+            <div class="content">
+              <span class="description">No posts to display.</span>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+    <div class="title_bar">
+      <img class="image" src="https://upload.wikimedia.org/wikipedia/commons/6/6f/Bluesky_logo_%28black%29.svg">
+      <span class="title">{{ trmnl.plugin_settings.instance_name }}</span>
+      <span class="instance">Timeline</span>
+    </div>
