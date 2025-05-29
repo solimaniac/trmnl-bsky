@@ -64,66 +64,6 @@ async function createBlueskySession() {
   });
 }
 
-async function getBlueskyTrends(accessJwt) {
-  if (!accessJwt) {
-    return Promise.reject(new Error('Access JWT is required to get trends.'));
-  }
-
-  const options = {
-    hostname: 'bsky.social',
-    path: '/xrpc/app.bsky.unspecced.getTrends?limit=6',
-    method: 'GET',
-    headers: {
-      'Authorization': `Bearer ${accessJwt}`,
-    },
-  };
-
-  return new Promise((resolve, reject) => {
-    const req = https.request(options, (res) => {
-      let rawData = '';
-      res.setEncoding('utf8');
-      res.on('data', (chunk) => {
-        rawData += chunk;
-      });
-      res.on('end', () => {
-        try {
-          if (res.statusCode >= 200 && res.statusCode < 300) {
-            const parsedData = JSON.parse(rawData);
-            
-            const mappedTrendsData = parsedData.trends ? parsedData.trends.map(trend => {
-              return {
-                displayName: trend.displayName,
-                postCount: trend.postCount,
-                startedAt: trend.startedAt,
-                status: trend.status
-              };
-            }) : [];
-            
-            resolve({ ...parsedData, trends: mappedTrendsData });
-          } else {
-            let errorMsg = `HTTP error! status: ${res.statusCode}`;
-            try {
-              const errorDetails = JSON.parse(rawData);
-              errorMsg += ` - ${errorDetails.error || ''}: ${errorDetails.message || rawData}`;
-            } catch (e) {
-              errorMsg += ` - Unable to parse error response: ${rawData}`;
-            }
-            reject(new Error(errorMsg));
-          }
-        } catch (e) {
-          reject(new Error(`Failed to parse JSON response: ${e.message}. Raw data: ${rawData}`));
-        }
-      });
-    });
-
-    req.on('error', (e) => {
-      reject(new Error(`Problem with request: ${e.message}`));
-    });
-
-    req.end();
-  });
-}
-
 async function getBlueskyPosts(accessJwt) {
   if (!accessJwt) {
     return Promise.reject(new Error('Access JWT is required to get posts.'));
@@ -149,29 +89,24 @@ async function getBlueskyPosts(accessJwt) {
         try {
           if (res.statusCode >= 200 && res.statusCode < 300) {
             const parsedData = JSON.parse(rawData);
-            
             const filteredPosts = parsedData.feed
               .filter(item => {
                 if (item.post.record.$type === 'app.bsky.feed.post' && 
                     item.post.record.reply) {
                   return false;
                 }
-                
                 if (item.reason && item.reason.$type === 'app.bsky.feed.defs#reasonRepost') {
                   return false;
                 }
-                
                 if (item.post.embed && 
                    (item.post.embed.$type === 'app.bsky.embed.images#view' || 
                     (item.post.record.embed && item.post.record.embed.$type === 'app.bsky.embed.images'))) {
                   return false;
                 }
-                
                 if ((item.post.embed && item.post.embed.$type === 'app.bsky.embed.external#view') ||
                     (item.post.record.embed && item.post.record.embed.$type === 'app.bsky.embed.external')) {
                   return false;
                 }
-                
                 return true;
               })
               .map(item => {
@@ -184,10 +119,7 @@ async function getBlueskyPosts(accessJwt) {
                   commentCount: item.post.replyCount
                 };
               });
-            
-            resolve({
-              posts: filteredPosts
-            });
+            resolve({ posts: filteredPosts });
           } else {
             let errorMsg = `HTTP error! status: ${res.statusCode}`;
             try {
@@ -228,8 +160,7 @@ async function sendData(data) {
 
   const postData = JSON.stringify({
     merge_variables: {
-      trends: data.trends || [],
-      posts: data.posts || []
+      posts: (data.posts || []).slice(0, 5)
     }
   });
 
@@ -292,29 +223,22 @@ async function main() {
     console.log(JSON.stringify(session, null, 2));
 
     if (session && session.accessJwt) {
-      const trendsResponse = await getBlueskyTrends(session.accessJwt);
-      console.log('\nBluesky Trends:');
-      console.log(JSON.stringify(trendsResponse, null, 2));
-
       const postsResponse = await getBlueskyPosts(session.accessJwt);
       console.log('\nBluesky Posts:');
       console.log(JSON.stringify(postsResponse, null, 2));
 
       const webhookResponse = await sendData({
-        trends: trendsResponse.trends || [],
         posts: postsResponse.posts || []
       });
       console.log('\nWebhook response:');
       console.log(`Status Code: ${webhookResponse.statusCode}`);
       console.log('Body:', JSON.stringify(webhookResponse.body, null, 2));
-
     } else {
       console.error('Failed to retrieve accessJwt from session.');
     }
-
   } catch (error) {
     console.error('An error occurred in main execution:', error.message);
   }
 }
 
-main();
+main(); 
