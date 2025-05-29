@@ -64,9 +64,9 @@ async function createBlueskySession() {
   });
 }
 
-async function getBlueskyPosts(accessJwt) {
+async function getBlueskyTimeline(accessJwt) {
   if (!accessJwt) {
-    return Promise.reject(new Error('Access JWT is required to get posts.'));
+    return Promise.reject(new Error('Access JWT is required to get timeline.'));
   }
 
   const options = {
@@ -89,7 +89,7 @@ async function getBlueskyPosts(accessJwt) {
         try {
           if (res.statusCode >= 200 && res.statusCode < 300) {
             const parsedData = JSON.parse(rawData);
-            const filteredPosts = parsedData.feed
+            const filteredTimeline = parsedData.feed
               .filter(item => {
                 if (item.post.record.$type === 'app.bsky.feed.post' && 
                     item.post.record.reply) {
@@ -119,7 +119,7 @@ async function getBlueskyPosts(accessJwt) {
                   commentCount: item.post.replyCount
                 };
               });
-            resolve({ posts: filteredPosts });
+            resolve({ timeline: filteredTimeline });
           } else {
             let errorMsg = `HTTP error! status: ${res.statusCode}`;
             try {
@@ -160,7 +160,7 @@ async function sendData(data) {
 
   const postData = JSON.stringify({
     merge_variables: {
-      posts: (data.posts || []).slice(0, 5)
+      timeline: (data.timeline || []).slice(0, 5)
     }
   });
 
@@ -223,12 +223,12 @@ async function main() {
     console.log(JSON.stringify(session, null, 2));
 
     if (session && session.accessJwt) {
-      const postsResponse = await getBlueskyPosts(session.accessJwt);
-      console.log('\nBluesky Posts:');
-      console.log(JSON.stringify(postsResponse, null, 2));
+      const timelineResponse = await getBlueskyTimeline(session.accessJwt);
+      console.log('\nBluesky Timeline:');
+      console.log(JSON.stringify(timelineResponse, null, 2));
 
       const webhookResponse = await sendData({
-        posts: postsResponse.posts || []
+        timeline: timelineResponse.timeline || []
       });
       console.log('\nWebhook response:');
       console.log(`Status Code: ${webhookResponse.statusCode}`);
