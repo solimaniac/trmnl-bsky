@@ -82,6 +82,11 @@ async function getBlueskyTimeline(accessJwt) {
 
 async function main() {
   try {
+    if (!process.env.TRMNL_CUSTOM_PLUGIN_TIMELINE_WEBHOOK_URL) {
+      console.log('TRMNL_CUSTOM_PLUGIN_TIMELINE_WEBHOOK_URL environment variable is not defined. Exiting gracefully.');
+      return;
+    }
+
     const session = await createBlueskySession();
     console.log('Session created successfully:');
     console.log(JSON.stringify(session, null, 2));
@@ -93,7 +98,7 @@ async function main() {
 
       const webhookResponse = await sendData({
         timeline: timelineResponse.timeline || []
-      }, 'timeline');
+      }, 'timeline', process.env.TRMNL_CUSTOM_PLUGIN_TIMELINE_WEBHOOK_URL);
       console.log('\nWebhook response:');
       console.log(`Status Code: ${webhookResponse.statusCode}`);
       console.log('Body:', JSON.stringify(webhookResponse.body, null, 2));

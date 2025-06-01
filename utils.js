@@ -62,11 +62,9 @@ async function createBlueskySession() {
   });
 }
 
-async function sendData(data, type = 'timeline') {
-  const webhookUrl = process.env.TRMNL_CUSTOM_PLUGIN_WEBHOOK_URL;
-
+async function sendData(data, type = 'timeline', webhookUrl) {
   if (!webhookUrl) {
-    console.error('Error: TRMNL_CUSTOM_PLUGIN_WEBHOOK_URL environment variable must be set.');
+    console.error('Error: Webhook URL must be provided.');
     process.exit(1);
   }
 
