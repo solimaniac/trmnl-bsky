@@ -31,22 +31,18 @@ async function getBlueskyTimeline(accessJwt) {
             const parsedData = JSON.parse(rawData);
             const filteredTimeline = parsedData.feed
               .filter(item => {
-                if (item.post.record.$type === 'app.bsky.feed.post' && 
-                    item.post.record.reply) {
+                if (item.post?.record?.$type === 'app.bsky.feed.post' && item.post.record.reply) {
                   return false;
                 }
-                if (item.reason && item.reason.$type === 'app.bsky.feed.defs#reasonRepost') {
+
+                if (item.reason?.$type === 'app.bsky.feed.defs#reasonRepost') {
                   return false;
                 }
-                if (item.post.embed && 
-                   (item.post.embed.$type === 'app.bsky.embed.images#view' || 
-                    (item.post.record.embed && item.post.record.embed.$type === 'app.bsky.embed.images'))) {
+
+                if (item.post?.embed || item.post?.record?.embed) {
                   return false;
                 }
-                if ((item.post.embed && item.post.embed.$type === 'app.bsky.embed.external#view') ||
-                    (item.post.record.embed && item.post.record.embed.$type === 'app.bsky.embed.external')) {
-                  return false;
-                }
+
                 return true;
               })
               .map(item => {
