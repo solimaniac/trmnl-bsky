@@ -1,0 +1,100 @@
+<style>
+  .profile-header {
+    position: relative;
+    margin-bottom: 20px;
+  }
+
+  .banner {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+
+  .profile-info {
+    position: relative;
+    padding: 0 16px;
+  }
+
+  .avatar {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    border: 4px solid white;
+    position: absolute;
+    top: -48px;
+    left: 16px;
+  }
+
+  .profile-stats {
+    display: flex;
+    gap: 24px;
+    margin: 16px 0;
+  }
+
+  .stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .stat-value {
+    font-weight: bold;
+    font-size: 1.2em;
+  }
+
+  .stat-label {
+    color: #666;
+    font-size: 0.9em;
+  }
+
+  .description {
+    white-space: pre-wrap;
+    margin: 16px 0;
+    line-height: 1.5;
+  }
+
+  .handle {
+    color: #666;
+    margin-bottom: 8px;
+  }
+
+  .display-name {
+    font-size: 1.5em;
+    font-weight: bold;
+    margin-bottom: 8px;
+  }
+</style>
+
+<div class="layout">
+  <div class="profile-header">
+    <div class="profile-info" style="padding-top: 24px; display: flex; align-items: center; justify-content: center; gap: 16px;">
+      {% if avatar %}
+        <img class="avatar" src="{{ avatar }}" alt="{{ displayName }}'s avatar" width="64" height="64" style="position: static; display: block; margin: 0;">
+      {% endif %}
+      <div style="text-align: left;">
+        <div class="display-name" style="margin-bottom: 2px;">{{ displayName | escape }}</div>
+        <div class="handle" style="margin-bottom: 0;">@{{ handle | escape }}</div>
+      </div>
+    </div>
+    <div class="profile-stats" style="justify-content: center; margin: 8px 0 0 0; display: flex; gap: 24px;">
+      <div class="stat">
+        <span class="stat-value">{{ followersCount }}</span>
+        <span class="stat-label">Followers</span>
+      </div>
+      <div class="stat">
+        <span class="stat-value">{{ followsCount }}</span>
+        <span class="stat-label">Following</span>
+      </div>
+      <div class="stat">
+        <span class="stat-value">{{ postsCount }}</span>
+        <span class="stat-label">Posts</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="title_bar">
+  <img class="image" src="https://upload.wikimedia.org/wikipedia/commons/6/6f/Bluesky_logo_%28black%29.svg" width="24" height="24">
+  <span class="title">{{ trmnl.plugin_settings.instance_name }}</span>
+</div> 
