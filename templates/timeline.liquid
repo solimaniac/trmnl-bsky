@@ -41,7 +41,7 @@
       {% for post in timeline %}
         <div class="item">
           <div class="content">
-            <span class="title title--small">{{ post.authorName | escape }}</span>
+            <span class="title title--small">{{ post.authorName | escape }} <span style="color: #666; font-size: 0.8em;">@{{ post.authorHandle | escape }}</span></span>
             <span class="description">{{ post.text | escape }}</span>
             <div class="engagement-stats">
               <span class="label label--small"><i class="fas fa-comment"></i> {{ post.commentCount }}</span>

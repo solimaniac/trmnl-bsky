@@ -48,7 +48,7 @@ async function getBlueskyTimeline(accessJwt) {
               .map(item => {
                 return {
                   authorName: item.post.author.displayName || item.post.author.handle,
-                  authorAvatar: item.post.author.avatar,
+                  authorHandle: item.post.author.handle,
                   text: item.post.record.text,
                   likeCount: item.post.likeCount,
                   repostCount: item.post.repostCount,
