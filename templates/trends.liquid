@@ -1,7 +1,7 @@
 <div class="layout">
-    <div class="list" data-list-limit="true" data-list-max-height="200" data-list-hidden-count="true" data-list-max-columns="2">
-      {% if trends and trends.size > 0 %}
-        {% for trend in trends %}
+  <div class="list" data-list-limit="true" data-list-max-height="200" data-list-max-columns="2">
+    {% if trends and trends.size > 0 %}
+      {% for trend in trends %}
         <div class="item">
           <div class="meta">
             <span class="index">{{ forloop.index }}</span>
@@ -16,34 +16,35 @@
               {% endif %}
             </span>
             <div class="flex gap--xsmall">
-              {% if trend.status and trend.status == "hot" %}
+              {% if trend.status and trend.status == 'hot' %}
                 <span class="label label--small">Trending now</span>
               {% else %}
-                {% assign started_at_seconds = trend.startedAt | date: "%s" | times: 1 %}
-                {% assign now_seconds = "now" | date: "%s" | times: 1 %}
+                {% assign started_at_seconds = trend.startedAt | date: '%s' | times: 1 %}
+                {% assign now_seconds = 'now' | date: '%s' | times: 1 %}
                 {% assign duration_in_seconds = now_seconds | minus: started_at_seconds %}
-  
+
                 {% if duration_in_seconds < 0 %}{% assign duration_in_seconds = 0 %}{% endif %}
-  
+
                 {% assign hours_ago = duration_in_seconds | divided_by: 3600 %}
                 <span class="label label--small label--underline">{{ hours_ago }}h ago</span>
               {% endif %}
             </div>
           </div>
         </div>
-        {% endfor %}
-      {% else %}
-        <span class="label">Trending Topics</span>
-        <div class="item">
-          <div class="content">
-            <span class="description">No topics are currently trending.</span>
-          </div>
+      {% endfor %}
+    {% else %}
+      <span class="label">Trending Topics</span>
+      <div class="item">
+        <div class="content">
+          <span class="description">No topics are currently trending.</span>
         </div>
-      {% endif %}
-    </div>
+      </div>
+    {% endif %}
   </div>
-  
-  <div class="title_bar">
-    <img class="image" src="https://upload.wikimedia.org/wikipedia/commons/6/6f/Bluesky_logo_%28black%29.svg">
-    <span class="title">{{ trmnl.plugin_settings.instance_name }}</span>
-  </div>
+</div>
+
+<div class="title_bar">
+  <img class="image" src="https://upload.wikimedia.org/wikipedia/commons/6/6f/Bluesky_logo_%28black%29.svg">
+  <span class="title">bsky.social</span>
+  <span class="instance">{{ trmnl.plugin_settings.instance_name }}</span>
+</div>
