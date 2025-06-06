@@ -1,8 +1,8 @@
 <div class="layout">
-  <div class="list" data-list-limit="true" data-list-max-height="200" data-list-max-columns="2">
+  <div class="grid grid--cols-2">
     {% if trends and trends.size > 0 %}
       {% for trend in trends %}
-        <div class="item">
+        <div class="item" style="max-height:50px">
           <div class="meta">
             <span class="index">{{ forloop.index }}</span>
           </div>
