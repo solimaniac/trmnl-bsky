@@ -11,7 +11,7 @@ async function getBlueskyTrends(accessJwt) {
 
   const options = {
     hostname: 'bsky.social',
-    path: '/xrpc/app.bsky.unspecced.getTrends?limit=5',
+    path: '/xrpc/app.bsky.unspecced.getTrends?limit=10',
     method: 'GET',
     headers: {
       'Authorization': `Bearer ${accessJwt}`,
