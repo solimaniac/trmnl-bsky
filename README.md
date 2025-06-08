@@ -41,17 +41,7 @@ This repository contains Node.js scripts and Liquid templates for integrating Bl
 
 ### 3. Environment Variables
 
-Create a `.env` file in the project root with the following variables:
-
-```bash
-# Bluesky credentials
-BSKY_IDENTIFIER=your.handle@bsky.social
-BSKY_APP_PASSWORD=your-app-password
-
-# TRMNL webhook URLs (from your plugin settings)
-TRMNL_CUSTOM_PLUGIN_TIMELINE_WEBHOOK_URL=https://usetrmnl.com/api/custom_plugins/...
-TRMNL_CUSTOM_PLUGIN_TRENDS_WEBHOOK_URL=https://usetrmnl.com/api/custom_plugins/...
-```
+Create a `.env` file in the project root based on the provided [`.env.sample`](.env.sample) file. Copy `.env.sample` to `.env` and update it with your actual credentials and webhook URLs.
 
 ### 4. Installation
 
