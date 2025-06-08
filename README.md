@@ -14,6 +14,7 @@ This repository contains Node.js scripts and Liquid templates for integrating Bl
 
 - **Timeline Plugin**: Displays your Bluesky timeline with post content and engagement metrics
 - **Trends Plugin**: Shows trending topics on Bluesky with post counts and trending status
+- **Profile Plugin**: Shows a Bluesky user's profile information including stats and bio
 
 ## Requirements
 
@@ -101,9 +102,20 @@ The `templates/` directory contains Liquid templates for rendering data on your 
 
 - `timeline.liquid`: Displays posts from your timeline with author info and engagement stats
 - `trends.liquid`: Shows trending topics in a grid layout with post counts
-- `profile.liquid`: (If applicable) Displays profile information
+- `profile.liquid`: Displays profile information
 
 Copy and paste the desired template into the markup field when creating your custom plugin in TRMNL.
+
+### Setting up the Profile Plugin
+
+1. Create a new private plugin in TRMNL:
+   - Navigate to Plugins > Private Plugin
+   - Select "Polling URL" as the strategy
+   - Copy the contents of `templates/profile.liquid` into the markup field
+   - Set the polling URL to: `https://public.api.bsky.app/xrpc/app.bsky.actor.getProfile?actor=<insert bluesky handle here>`
+     - Replace `<insert bluesky handle here>` with the Bluesky handle you want to display
+     - Example: `https://public.api.bsky.app/xrpc/app.bsky.actor.getProfile?actor=bob.bsky.social`
+   - Save the plugin
 
 ## License
 
