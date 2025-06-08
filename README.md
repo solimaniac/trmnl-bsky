@@ -4,6 +4,8 @@ Unofficial Bluesky plugins for TRMNL e-ink displays. Display your Bluesky timeli
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
+![Preview](assets/preview.png)
+
 ## Overview
 
 This repository contains Node.js scripts and Liquid templates for integrating Bluesky social media data with TRMNL displays. The plugins fetch data from Bluesky's API and display it on your TRMNL device using webhook-based custom plugins.
@@ -16,7 +18,7 @@ This repository contains Node.js scripts and Liquid templates for integrating Bl
 ## Requirements
 
 - Node.js 22.x
-- A TRMNL device with Developer Add-on
+- A TRMNL device
 - A Bluesky account with an app password
 - A hosting solution for running the sync scripts periodically (e.g., Heroku, cron server, or local machine)
 
