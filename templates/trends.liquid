@@ -1,12 +1,10 @@
 <div class="layout">
-  <div class="grid grid--cols-2">
+  <div class="list">
     {% if trends and trends.size > 0 %}
       {% for trend in trends %}
-        <div class="item" style="max-height:50px">
-          <div class="meta">
+        <div class="item flex flex--space-between" style="align-items: center; justify-content: space-between;">
+          <div class="flex" style="align-items: center; gap: 1rem;">
             <span class="index">{{ forloop.index }}</span>
-          </div>
-          <div class="content">
             <span class="title title--small">{{ trend.displayName | escape }}</span>
             <span class="description">
               {% if trend.postCount >= 1000 %}
@@ -15,20 +13,20 @@
                 {{ trend.postCount }} posts
               {% endif %}
             </span>
-            <div class="flex gap--xsmall">
-              {% if trend.status and trend.status == 'hot' %}
-                <span class="label label--small">Trending now</span>
-              {% else %}
-                {% assign started_at_seconds = trend.startedAt | date: '%s' | times: 1 %}
-                {% assign now_seconds = 'now' | date: '%s' | times: 1 %}
-                {% assign duration_in_seconds = now_seconds | minus: started_at_seconds %}
+          </div>
+          <div style="margin-left: auto;">
+            {% if trend.status and trend.status == 'hot' %}
+              <span class="label label--small">Trending now</span>
+            {% else %}
+              {% assign started_at_seconds = trend.startedAt | date: '%s' | times: 1 %}
+              {% assign now_seconds = 'now' | date: '%s' | times: 1 %}
+              {% assign duration_in_seconds = now_seconds | minus: started_at_seconds %}
 
-                {% if duration_in_seconds < 0 %}{% assign duration_in_seconds = 0 %}{% endif %}
+              {% if duration_in_seconds < 0 %}{% assign duration_in_seconds = 0 %}{% endif %}
 
-                {% assign hours_ago = duration_in_seconds | divided_by: 3600 %}
-                <span class="label label--small label--underline">{{ hours_ago }}h ago</span>
-              {% endif %}
-            </div>
+              {% assign hours_ago = duration_in_seconds | divided_by: 3600 %}
+              <span class="label label--small label--underline">{{ hours_ago }}h ago</span>
+            {% endif %}
           </div>
         </div>
       {% endfor %}
