@@ -98,14 +98,6 @@ Set up cron jobs to run the scripts periodically:
 
 ## Templates
 
-The `templates/` directory contains Liquid templates for rendering data on your TRMNL display:
-
-- `timeline.liquid`: Displays posts from your timeline with author info and engagement stats
-- `trends.liquid`: Shows trending topics in a grid layout with post counts
-- `profile.liquid`: Displays profile information
-
-Copy and paste the desired template into the markup field when creating your custom plugin in TRMNL.
-
 ### Setting up the Profile Plugin
 
 1. Create a new private plugin in TRMNL:
